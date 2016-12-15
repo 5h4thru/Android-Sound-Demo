@@ -9,6 +9,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity {
 
     MediaPlayer mediaPlayer = null;
@@ -43,6 +46,38 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 //Log.i("seekBar value", Integer.toString(progress));
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        // audio seekbar controls the playback of the audio
+        final SeekBar audioSeekBar = (SeekBar) findViewById(R.id.audioSeekBar);
+        // set max of the audioSeekBar
+        audioSeekBar.setMax(mediaPlayer.getDuration()); // set the max to the length of the audio file
+
+        // control the playback of the audio file
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                audioSeekBar.setProgress(mediaPlayer.getCurrentPosition()); // update the position of audioSeekBar as the audio is played
+            }
+        }, 0, 100); // scheduled every tenth of a second (just to make the progress smooth)
+
+        audioSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                //Log.i("audioSeekBar value", Integer.toString(progress));
+                if(fromUser) mediaPlayer.seekTo(progress);
             }
 
             @Override
